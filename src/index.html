@@ -1,0 +1,98 @@
+<html>
+    <head>
+        <title>WebSocket ChatApp</title>
+        <meta charset = "UTF-8" />
+        <meta name = "viewport" content = "width = device-width, initial-scale=1.0" />
+    </head>
+
+    <body>
+        <form id = "nameSelector">
+            <p>Select a name</p>
+            <input id = "nameInput" placeholder = "enter your name here" />
+        </form>
+        <form id = "roomName">
+            <p>Select a room</p>
+            <input id = "roomCodeInput" placeholder = "enter room code here" />
+        </form>
+        <div id = "chatRoom">
+        <div id = "chat"></div>
+        <div class=>
+            <input id = "message" placeholder = "type your message here" />
+            <button onclick="sendMessage()">send</button>
+        </div>
+        </div>
+
+        <script>
+            let websocket = null;
+            let roomSelector = document.getElementById("roomName");
+            let nameInput = document.getElementById("nameInput");
+            let roomButton = document.getElementById("roomButton");
+            let chatRoom = document.getElementById("chatRoom");
+            let roomCodeInput = document.getElementById("roomCodeInput");
+            let chat = document.getElementById("chat");
+            let nameSelector = document.getElementById("nameSelector");
+            let username;
+            let roomCode
+
+            nameSelector.style.display="none";
+            roomSelector.style.display="none";
+            chatRoom.style.display="none";
+
+            function startNameChooser() {
+                nameSelector.style.display="block";
+                nameSelector.addEventListener("submit", event => {
+                    event.preventDefault();
+                    username = nameInput.value;
+                    startRoomChooser();
+                })
+            }
+
+            function startRoomChooser() {
+                nameSelector.style.display="none";
+                roomSelector.style.display="block";
+                roomSelector.addEventListener("submit", (event) => {
+                    event.preventDefault();
+                    roomCode = roomCodeInput.value;
+                    startChatRoom()
+                })
+            }
+
+            function startChatRoom() {
+                roomSelector.style.display="none";
+                chatRoom.style.display="block";
+                joinRoom(roomCode, sendMessage);
+            }
+
+            function joinRoom(roomcode, username) {
+                //enter worker url, add room specified by path
+                websocket = new WebSocket();
+                websocket.addEventListener("message", (event) => {
+                    const data = JSON.parse(event.data);
+                    if (data.type = "message") {
+                        const para = document.createElement("p");
+                        const node = document.createTextNode(`${data.user}: ${data.data}`);
+                        para.appendChild(node);
+                        chat.appendChild(para);
+                    }
+                })
+            }
+
+            function sendMessage() {
+                const message = document.getElementById("message").value;
+                const para = document.createElement("p");
+                const node = document.createTextNode(`${username}: ${message}`);
+                para.appendChild(node);
+                chat.appendChild(para);
+
+                if (websocket === null || !message) {
+                    return false;
+                }
+
+                websocket.send(JSON.stringify({ type: "message", user: username, data: message }));
+            }
+
+            startNameChooser();
+        </script>
+
+    </body>
+</html>

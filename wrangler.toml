@@ -1,0 +1,6 @@
+# Top-level configuration
+name = "worker-chatapp"
+main = "src/main.js"
+compatibility_date = "2023-12-18"
+node_compat = true
+workers_dev = true
