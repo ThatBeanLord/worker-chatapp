@@ -60,12 +60,22 @@
             function startChatRoom() {
                 roomSelector.style.display="none";
                 chatRoom.style.display="block";
-                joinRoom(roomCode, sendMessage);
+                joinRoom();
             }
 
-            function joinRoom(roomcode, username) {
+            function joinRoom() {
                 //enter worker url, add room specified by path
-                websocket = new WebSocket();
+                let res = fetch('https://worker-chatapp.beansamuel1234.workers.dev' + "/room/" + roomCode, {
+                    headers: {
+                        Upgrade: 'websocket',
+                    }
+                })
+
+                websocket = res.websocket;
+                if (!websocket) {
+                    throw new Error("server didnt accept websocket");
+                }
+
                 websocket.addEventListener("message", (event) => {
                     const data = JSON.parse(event.data);
                     if (data.type = "message") {
@@ -77,18 +87,14 @@
                 })
             }
 
-            function sendMessage() {
-                const message = document.getElementById("message").value;
-                const para = document.createElement("p");
-                const node = document.createTextNode(`${username}: ${message}`);
-                para.appendChild(node);
-                chat.appendChild(para);
+            function async sendMessage() {
+                roomCodeInput.value = "";
 
-                if (websocket === null || !message) {
+                if (websocket == null || !message) {
                     return false;
                 }
 
-                websocket.send(JSON.stringify({ type: "message", user: username, data: message }));
+                websocket.send(JSON.stringify({ type: "message", room: roomCode, user: username, data: message }));
             }
 
             startNameChooser();
