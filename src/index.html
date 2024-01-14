@@ -23,7 +23,7 @@
         </div>
 
         <script>
-            let websocket = null;
+
             let roomSelector = document.getElementById("roomName");
             let nameInput = document.getElementById("nameInput");
             let roomButton = document.getElementById("roomButton");
@@ -31,6 +31,8 @@
             let roomCodeInput = document.getElementById("roomCodeInput");
             let chat = document.getElementById("chat");
             let nameSelector = document.getElementById("nameSelector");
+            let message = document.getElementById("message");
+            let websocket;
             let username;
             let roomCode
 
@@ -43,11 +45,11 @@
                 nameSelector.addEventListener("submit", event => {
                     event.preventDefault();
                     username = nameInput.value;
-                    startRoomChooser();
+                    startChatRoom();
                 })
             }
 
-            function startRoomChooser() {
+            /*function startRoomChooser() {
                 nameSelector.style.display="none";
                 roomSelector.style.display="block";
                 roomSelector.addEventListener("submit", (event) => {
@@ -55,27 +57,12 @@
                     roomCode = roomCodeInput.value;
                     startChatRoom()
                 })
-            }
+            }*/
 
             function startChatRoom() {
-                roomSelector.style.display="none";
+                nameSelector.style.display="none";
                 chatRoom.style.display="block";
-                joinRoom();
-            }
-
-            function joinRoom() {
-                //enter worker url, add room specified by path
-                let res = fetch('https://worker-chatapp.beansamuel1234.workers.dev' + "/room/" + roomCode, {
-                    headers: {
-                        Upgrade: 'websocket',
-                    }
-                })
-
-                websocket = res.websocket;
-                if (!websocket) {
-                    throw new Error("server didnt accept websocket");
-                }
-
+                websocket = new WebSocket("ws://localhost:8080");
                 websocket.addEventListener("message", (event) => {
                     const data = JSON.parse(event.data);
                     if (data.type = "message") {
@@ -87,14 +74,18 @@
                 })
             }
 
-            function async sendMessage() {
-                roomCodeInput.value = "";
-
-                if (websocket == null || !message) {
+            function sendMessage() {
+                const msg = message.value;
+                if (!msg) {
                     return false;
-                }
+                } 
 
-                websocket.send(JSON.stringify({ type: "message", room: roomCode, user: username, data: message }));
+                try {
+                    websocket.send(JSON.stringify({ type: "message", user: username, data: msg }));
+                } catch (err) {
+                    console.log(err);
+                }
+                message.value = "";
             }
 
             startNameChooser();

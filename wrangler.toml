@@ -1,11 +1,6 @@
 # Top-level configuration
 name = "worker-chatapp"
-main = "src/webserv.js"
+main = "src/webserv.mjs"
 compatibility_date = "2023-12-18"
 node_compat = true
 workers_dev = true
-
-[[rules]]
-type = "Data"
-globs = []
-fallthrough = false
