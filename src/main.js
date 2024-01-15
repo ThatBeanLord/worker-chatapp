@@ -1,52 +1,37 @@
-const WebSocket = require('ws');
-let username = "greg";
-let roomCode = "greg";
-import("./webserv.mjs");
+const WebSocket = require("ws");
+const readline = require('readline').createInterface({
+    input: process.stdin,
+    output: process.stdout
+  });
 
-const asyncFunction = async () => {
-    let url = new URL('wss://worker-chatapp.beansamuel1234.workers.dev' + "/room/" + roomCode + "/websocket");
+let username;
+  
+readline.question('Enter your username', name => {
+    username = name;
+    readline.setPrompt("enter chat messages");
+    readline.prompt();
+});
+
+let websocket = new WebSocket("ws://localhost:8080");
+websocket.addEventListener("message", async event => {
+    const data = JSON.parse(event.data);
+    if (data.type == "message" && data.user) {
+        console.log(`${data.user}: ${data.data}`)
+    }
+})
+
+readline.on('line', async msg => {
+    if (!msg) {
+        return false;
+    }
+
+    if (msg == "end chat") {
+        readline.closer();
+    }
 
     try {
-        let websocket = new WebSocket(url);
-
-        if (!websocket) {
-            console.log(resp.status);
-            console.log(websocket);
-            throw new Error("server didn't accept WebSocket");
-        }
-
-
-        websocket.onopen = () => {
-            console.log('connection open');
-            asb(websocket);
-        }
-
-        setTimeout(() => console.log(websocket.readyState), 3000);
-
+        websocket.send(JSON.stringify({ type: "message", user: username, data: msg}));
     } catch (err) {
         console.log(err);
     }
-
-    /*websocket.addEventListener("message", (event) => {
-        console.log(event);
-        const data = JSON.parse(event.data);
-        if (data.type = "message") {
-            console.log(data.data);
-        }
-    })
-
-    websocket.send(JSON.stringify({ type: "message", room: roomCode, user: username, data: "message" }))
-    */
-}
-
-const asb = (ws) => {
-    ws.addEventListener("message", (event) => {
-        console.log("message received:");
-        const data = JSON.parse(event.data);
-        console.log(data);
-        if (data.type == "message") {
-            console.log(data);
-        }
-    })
-}
-asyncFunction();
+})

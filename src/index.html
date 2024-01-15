@@ -63,9 +63,9 @@
                 nameSelector.style.display="none";
                 chatRoom.style.display="block";
                 websocket = new WebSocket("ws://localhost:8080");
-                websocket.addEventListener("message", (event) => {
+                websocket.addEventListener("message", event => {
                     const data = JSON.parse(event.data);
-                    if (data.type = "message") {
+                    if (data.type == "message") {
                         const para = document.createElement("p");
                         const node = document.createTextNode(`${data.user}: ${data.data}`);
                         para.appendChild(node);
