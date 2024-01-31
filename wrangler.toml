@@ -4,3 +4,12 @@ main = "src/webserv.mjs"
 compatibility_date = "2023-12-18"
 node_compat = true
 workers_dev = true
+
+[durable_objects]
+bindings = [
+    { name = "room", class_name = "chatroom"}
+]
+
+[[migrations]]
+tag = "v1"
+new_classes = ["chatroom"]

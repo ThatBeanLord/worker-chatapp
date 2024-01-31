@@ -12,10 +12,14 @@ readline.question('Enter your username', name => {
     readline.prompt();
 });
 
-let websocket = new WebSocket("ws://localhost:8080");
+let roomCode = "sadisd";
+const hostname = "worker-chatapp.beansamuel1234.workers.dev";
+let url = "https://" + hostname + "/room/" + roomCode + "/websocket";
+websocket = new WebSocket(url);
+
 websocket.addEventListener("message", async event => {
     const data = JSON.parse(event.data);
-    if (data.type == "message" && data.user) {
+    if (data.type == "message") {
         console.log(`${data.user}: ${data.data}`)
     }
 })

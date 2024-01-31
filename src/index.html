@@ -34,7 +34,7 @@
             let message = document.getElementById("message");
             let websocket;
             let username;
-            let roomCode
+            let roomCode;
 
             nameSelector.style.display="none";
             roomSelector.style.display="none";
@@ -62,7 +62,12 @@
             function startChatRoom() {
                 nameSelector.style.display="none";
                 chatRoom.style.display="block";
-                websocket = new WebSocket("ws://localhost:8080");
+
+                roomCode = "sadisd";
+                const wss = document.location.protocol === "http:" ? "ws://" : "wss://";
+                const hostname = "worker-chatapp.beansamuel1234.workers.dev";
+                let url = wss + hostname + "/room/" + roomCode + "/websocket";
+                websocket = new WebSocket(url);
                 websocket.addEventListener("message", event => {
                     const data = JSON.parse(event.data);
                     if (data.type == "message") {
